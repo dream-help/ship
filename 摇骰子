@@ -1,0 +1,48 @@
+def game_yaoshaizi():
+    a_list=[1,2,3]
+    for a in range(3):
+        a_list[a] = random.randrange(1,7)
+        print("第{}颗骰子的点数是：{}".format(a + 1 , a_list[a]))
+    print("总点数是",sum(a_list))
+    if 11 <= sum(a_list) <= 18 :
+        result = 1
+    elif 3 <= sum(a_list) <= 10 :
+        result = 2
+    return result
+import os , shelve
+import random
+print("""欢迎━*｀∀´*ノ来到追梦人赌场
+目前启动的项目有摇骰子，赔率为1，通过猜大小来玩，让我们开始吧。。。。。。""")
+data = shelve.open("data")
+if "money_all" in data :
+    data["enter_count"] += 1
+else:
+    data["money_all"] = 1000
+    data["enter_count"] = 1
+while True :
+    try :
+        if data["money_all"] == 0 :
+            pingjia = int(input("没钱了？给我一个五星好评吧？（一星到五星对应数字1-5）"))
+            data["money_all"] = pingjia * 100
+            print("您当前的本金为：",data["money_all"])
+        user = int(input("Big or Small? (1或2)"))
+        while True :
+            amount = int(input("请下注，您当前的本金为：{}  ".format(data["money_all"])))
+            if amount <= data["money_all"] :
+                break
+            else:
+                print("注金大于本金或格式错误")
+        result = game_yaoshaizi()
+        if result == user :
+            print("You win")
+            data["money_all"] += amount
+        else:
+            print("You lost")
+            data["money_all"] -= amount
+        print("您当前的本金为：",data["money_all"])
+    
+        if int(input("是否离开追梦人赌场？（是或否请输入1或2）")) == 1 :
+            data.close()
+            break
+    except BaseException :
+        pass
